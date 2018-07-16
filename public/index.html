@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="content container">
+        <div class="chat_page row">
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <div class="sidebar_title">
+                        <h3 class="title">ONLINE USERS</h3>
+                    </div>
+                    <div class="sidebarContent">
+                        <ul id="onlineUsers"><h1>Online users</h1></ul>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <div class="sidebar_title">
+                        <h3 class="title">My chat name</h3>
+                    </div>
+                    <div class="sidebarContent">
+                        <form action="">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control usernameInput" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn" id="changeUsernameBtn">ok</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div>
+                
+            </div>
+            <div class="col-md-9">
+                <form action="" id='message_form'>
+                        <div class="input-group mb-3">
+                            <input type="text" id='m' class="form-control" placeholder="Enter your message">
+                            <div class="input-group-append">
+                            <button class="btn btn-info" type="submit" id="button-addon2">Submit</button>
+                            </div>
+                        </div>
+                </form>
+
+                <ul id="messages"></ul>
+            </div>
+         </div>
+
+            <div class="login_page">
+                <form action="" class='login_form'>
+                    <div class="input-group mb-3">
+                        <input type="text" id='loginUsername' class="form-control" placeholder="Enter your name">
+                        <div class="input-group-append">
+                        <button class="btn btn-info" type="submit" id="button-addon2">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>  
+        
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>
