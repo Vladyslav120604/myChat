@@ -3,7 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var users = [];
+var users = {};
+var onlineUsers = [];
 
 
 app.use(express.static('public'));
@@ -12,11 +13,10 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function(){
 
-        console.log(socket.username + 'left');
+        onlineUsers.splice(onlineUsers.indexOf(socket.username), 1);
+        delete users[socket.username];
 
-        users.splice(users.indexOf(socket.username), 1);
-
-        updateUsers();
+        updateOnlineUsers();
 
         socket.broadcast.emit('user left', {
             username: socket.username
@@ -35,8 +35,11 @@ io.on('connection', function(socket){
     socket.on('add user', function(username){
         socket.username = username;
 
-        users.push(socket.username);
-        updateUsers();
+        
+        users[socket.username] = socket.id;
+        onlineUsers.push(socket.username);
+
+        updateOnlineUsers();
 
         socket.broadcast.emit('user joined', {
             username: socket.username
@@ -46,7 +49,6 @@ io.on('connection', function(socket){
     });
 
     socket.on('change uesrname', function (newUsername) {
-        console.log('change username');
 
         if  (newUsername === socket.username){
             return false
@@ -56,19 +58,42 @@ io.on('connection', function(socket){
             newUsername: newUsername,
             oldUsername: socket.username
         });
+       
+        delete users[socket.username];
+        socket.username = newUsername;
+        users[socket.username] = socket.id;
+
+        onlineUsers.splice(onlineUsers.indexOf(socket.username), 1);
+        onlineUsers.push(socket.username);
 
         socket.emit('reportUserNewUsername', true);
-       
-        users.splice(users.indexOf(socket.username), 1);
-        socket.username = newUsername;
-        users.push(socket.username);
 
-        updateUsers();
+        updateOnlineUsers();
     });
 
-    function updateUsers() {
-        io.sockets.emit('get users', users);
+    socket.on('privat chat msg', function(data){
+        var id = getUserIdByUsername(data.to);
+
+        socket.broadcast.to(id).emit('pm', {
+            username: socket.username,
+            msg: data.msg
+        });
+
+        socket.emit('pm', {
+            username: socket.username,
+            msg: data.msg
+        });
+    })
+
+    function updateOnlineUsers() {
+        io.sockets.emit('online users', onlineUsers);
+    };
+
+    function getUserIdByUsername(username) {
+        return users[username]
     }
+
+
 
     
 

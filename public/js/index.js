@@ -5,13 +5,52 @@ var loginUsername = $('#loginUsername');
 var messageInput = $('#m');
 var typing = false;
 var socket = io();
+var privatRegExp = /(\@)\w+/g;
+var usernamePrivatRegExp = /@(\w+)/g;
 
 chatPage.hide();
 
 $(function (){
+    function checkForPrivacyMsg(msg){
+        if(msg.search(privatRegExp) != -1){
+            return true
+        }
+
+        else{
+            return false
+        }
+    };
+
+    function getPrivatUsername(msg){
+        return usernamePrivatRegExp.exec(msg)[1];
+    }
+
+    function getCorrectMsg(msg){
+        msg = msg.replace(usernamePrivatRegExp, '');
+        return msg;
+
+    }
+
+
     $('#message_form').submit(function(){
-        socket.emit('chat msg', messageInput.val());
+
+        if(checkForPrivacyMsg(messageInput.val()) == true){
+            privatUsername = getPrivatUsername(messageInput.val());
+            msg = getCorrectMsg(messageInput.val());
+
+            socket.emit('privat chat msg', {
+                to: privatUsername,
+                msg: msg
+            });
+        }
+
+        else{
+            socket.emit('chat msg', messageInput.val());  
+        }
+        
         messageInput.val('');
+
+        
 
         return false
     });
@@ -39,8 +78,8 @@ $(function (){
 
 
 
-    socket.on('chat msg', function(msg){
-        $('#messages').append($('<li>').html('<b>' + msg.username + ' </b>' + msg.msg));
+    socket.on('chat msg', function(data){
+        $('#messages').append($('<li>').html('<b>' + data.username + ' </b>' + data.msg));
     });
 
     socket.on('user joined', function(msg){
@@ -51,7 +90,7 @@ $(function (){
         $('#messages').append($('<li class="centered">').html('<b>' + msg.username + '</b>'  + ' left :( '));
     });
 
-    socket.on('get users', function (data) {
+    socket.on('online users', function (data) {
         $('#onlineUsers').empty();
 
         for (let i = 0; i < data.length; i++) {
@@ -73,4 +112,9 @@ $(function (){
         $('#messages').append($('<li class="centered">').html('Your username was successfully renamed'));
         
     });
+
+    socket.on('pm', function(data){
+        $('#messages').append($('<li>').html('<b>' + data.username + ' </b>' + data.msg));
+    });
+
 })
