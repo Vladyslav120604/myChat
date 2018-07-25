@@ -114,7 +114,7 @@ $(function (){
     });
 
     socket.on('pm', function(data){
-        $('#messages').append($('<li>').html('<b>' + data.username + ' </b>' + data.msg));
+        $('#messages').append($('<li class="pm">').html('<b>' + data.username + ' </b>' + data.msg));
     });
 
 })
